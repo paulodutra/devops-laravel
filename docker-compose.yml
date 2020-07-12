@@ -1,0 +1,54 @@
+version: '3'
+services:
+    db:
+        image: mysql:5.7
+        container_name: db
+        restart: always
+        tty: true
+        ports: 
+            - "3336:3306"
+        volumes: 
+            - ./docker/dbdata:/var/lib/mysql
+        environment: 
+            - MYSQL_DATABASE=laravel
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=root
+        networks: 
+            - laravel-network
+    redis:
+        image: redis:alpine 
+        container_name: redis
+        expose:
+            - 6379 
+        networks: 
+            - laravel-network
+    app:
+        build: 
+            context: ./
+            dockerfile: php-fpm.dockerfile
+        container_name: app
+        volumes: 
+            - ./:/var/www
+        networks: 
+            - laravel-network
+        depends_on: 
+            - db
+            - redis
+    nginx:
+        build: 
+            context: ./
+            dockerfile: nginx.dockerfile
+        container_name: nginx
+        restart: always
+        tty: true
+        ports:
+            - "8000:80"
+        volumes: 
+            - ./:/var/www
+        networks: 
+            - laravel-network
+networks:  
+    laravel-network:
+        driver: bridge
+        
+     
