@@ -1,8 +1,10 @@
 version: '3'
 services:
     db:
-        image: mysql:5.7
-        container_name: db
+        build:
+            context: ./
+            dockerfile: mysql.dockerfile
+        container_name: db-laravel
         restart: always
         tty: true
         ports: 
@@ -17,7 +19,7 @@ services:
             - laravel-network
     redis:
         image: redis:alpine 
-        container_name: redis
+        container_name: redis-laravel
         expose:
             - 6379 
         networks: 
@@ -26,7 +28,7 @@ services:
         build: 
             context: ./
             dockerfile: php-fpm.dockerfile
-        container_name: app
+        container_name: app-laravel
         volumes: 
             - ./:/var/www
         networks: 
@@ -38,7 +40,7 @@ services:
         build: 
             context: ./
             dockerfile: nginx.dockerfile
-        container_name: nginx
+        container_name: nginx-laravel
         restart: always
         tty: true
         ports:
